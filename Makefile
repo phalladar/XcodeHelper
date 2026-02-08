@@ -20,6 +20,7 @@ bundle: build
 install: bundle
 	rm -rf $(INSTALL_DIR)/$(APP_BUNDLE)
 	cp -R $(APP_BUNDLE) $(INSTALL_DIR)/$(APP_BUNDLE)
+	xattr -cr $(INSTALL_DIR)/$(APP_BUNDLE)
 	@echo "Installed $(APP_BUNDLE) to $(INSTALL_DIR)"
 	@echo "Launch from $(INSTALL_DIR)/$(APP_BUNDLE) or Spotlight."
 
