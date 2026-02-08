@@ -1,12 +1,15 @@
 import AppKit
 
 enum XcodeActions {
+    /// AppleScript error code for "not permitted" (user denied Automation permission)
+    private static let errAEEventNotPermitted = -1743
+
     static func buildAndRun() {
-        let xcodeApps = NSWorkspace.shared.runningApplications.filter {
+        let isRunning = NSWorkspace.shared.runningApplications.contains {
             $0.bundleIdentifier == "com.apple.dt.Xcode"
         }
 
-        guard !xcodeApps.isEmpty else {
+        guard isRunning else {
             NotificationManager.send(
                 title: "XcodeHelper",
                 body: "Xcode is not running."
@@ -15,29 +18,26 @@ enum XcodeActions {
         }
 
         let script = """
-        tell application "Xcode" to activate
-        delay 0.3
-        tell application "System Events"
-            keystroke "r" using {command down}
+        tell application "Xcode"
+            activate
+            run workspace document 1
         end tell
         """
 
         var error: NSDictionary?
-        if let appleScript = NSAppleScript(source: script) {
-            appleScript.executeAndReturnError(&error)
-        }
+        NSAppleScript(source: script)?.executeAndReturnError(&error)
 
         if let error = error {
-            let message = error[NSAppleScript.errorMessage] as? String ?? "Unknown error"
-            NotificationManager.send(
-                title: "Build & Run Failed",
-                body: message
-            )
-        } else {
-            NotificationManager.send(
-                title: "XcodeHelper",
-                body: "Build & Run triggered in Xcode."
-            )
+            let errorNumber = error[NSAppleScript.errorNumber] as? Int ?? 0
+            if errorNumber == errAEEventNotPermitted {
+                NotificationManager.sendPermissionError()
+            } else {
+                let message = error[NSAppleScript.errorMessage] as? String ?? "Unknown error"
+                NotificationManager.send(
+                    title: "XcodeHelper",
+                    body: "Build & Run failed: \(message)"
+                )
+            }
         }
     }
 }

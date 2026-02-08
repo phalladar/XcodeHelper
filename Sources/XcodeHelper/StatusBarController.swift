@@ -31,6 +31,10 @@ final class StatusBarController {
 
         menu.addItem(.separator())
 
+        let fixPermsItem = NSMenuItem(title: "Fix Permissions...", action: #selector(fixPermissions), keyEquivalent: "")
+        fixPermsItem.target = self
+        menu.addItem(fixPermsItem)
+
         let prefsItem = NSMenuItem(title: "Preferences...", action: #selector(openPreferences), keyEquivalent: ",")
         prefsItem.target = self
         menu.addItem(prefsItem)
@@ -50,6 +54,10 @@ final class StatusBarController {
 
     @objc private func cleanDerivedData() {
         DerivedDataCleaner.clean()
+    }
+
+    @objc private func fixPermissions() {
+        openAutomationSettings()
     }
 
     @objc private func openPreferences() {
