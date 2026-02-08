@@ -1,0 +1,5 @@
+.build/
+XcodeHelper.app/
+.swiftpm/
+.claude/
+.DS_Store
