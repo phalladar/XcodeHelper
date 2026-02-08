@@ -15,7 +15,7 @@ No Dock icon, no bloat. It sits in your menu bar and does exactly two things wel
 
 ## What It Does
 
-**Build & Run** — Sends Cmd+R to Xcode from wherever you are. It respects your current scheme and simulator selection because it's driving Xcode directly, not reinventing the wheel.
+**Build & Run** — Triggers a build-and-run in Xcode from wherever you are. It uses AppleScript to tell Xcode to run the active workspace document directly, so your current scheme and simulator selection are always respected.
 
 **Clean Derived Data** — Nukes everything in `~/Library/Developer/Xcode/DerivedData`. Handles individual file errors gracefully (locked files from active builds get skipped and reported). The directory itself is preserved.
 
@@ -44,13 +44,12 @@ Both are customizable through the Preferences menu. There's a reset-to-defaults 
 
 ## Permissions
 
-macOS will prompt you for three things on first launch:
+macOS will prompt you for two things on first launch:
 
 1. **Notifications** for success/failure feedback
-2. **Accessibility** so System Events can send keystrokes to Xcode
-3. **Automation** so AppleScript can control Xcode and System Events
+2. **Automation** so AppleScript can control Xcode
 
-All manageable in System Settings > Privacy & Security.
+All manageable in System Settings > Privacy & Security. If a permission is missing, XcodeHelper will send a notification you can click to jump straight to the relevant Settings pane. You can also use **Fix Permissions...** from the menu bar dropdown at any time.
 
 ## Build Targets
 
@@ -63,7 +62,7 @@ make clean     # Remove build artifacts
 
 ## Under the Hood
 
-**Build & Run** checks whether Xcode is running via `NSWorkspace`, then uses AppleScript to activate it and System Events to fire the Cmd+R keystroke. Because it's sending the keystroke to Xcode directly, your scheme and destination selection are preserved.
+**Build & Run** checks whether Xcode is running via `NSWorkspace`, then uses AppleScript to activate Xcode and run the frontmost workspace document. No System Events or simulated keystrokes involved — it talks to Xcode's scripting interface directly. If Automation permission hasn't been granted, you'll get an actionable notification that opens System Settings.
 
 **Clean Derived Data** uses `FileManager` to remove the contents of the DerivedData directory. Files locked by an active build are skipped, and the count of skipped files is reported via notification.
 
